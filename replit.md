@@ -15,6 +15,42 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
+- **LLM**: Anthropic claude-sonnet-4-6 via Replit AI Integrations
+
+## Artifacts
+
+### Objective Crystallizer (`artifacts/crystallizer`)
+- **Frontend**: React + Vite at `/`
+- **Purpose**: Converts teacher session intent into a three-field constraint-form objective
+- **Fields**: maximize / must_not_break / success_criterion
+
+### API Server (`artifacts/api-server`)
+- **Backend**: Express 5, TypeScript
+- **Routes**:
+  - `POST /api/crystallize` — LLM-powered intent → objective conversion
+  - `POST /api/log-edit` — Fire-and-forget field edit tracking
+  - `GET /api/healthz` — Health check
+
+## Key Architecture Decisions
+
+### Behavioral Specificity Classifier
+- Location: `artifacts/api-server/src/services/crystallize.ts`
+- **Blocklist-first**: Cognitive state verbs ("understands", "grasps", "knows", etc.) are immediately rejected
+- **Allowlist check**: Observable action verbs + numeric threshold patterns must both be present
+- Returns `{status: "clarify"}` with a single focused question if criterion fails
+- Never repairs the criterion automatically — returns to the teacher for one specific input
+
+### T0 Sync-Integrity Rules
+- Prompt text is in `src/services/crystallize.ts`
+- Business logic constraints (blocklist/allowlist) are in `src/services/crystallize.ts`
+- Three-field output contract enforced at schema + application layer
+- No regeneration in WEDGE phase
+
+### Logging / Edit Tracking
+- Edit events are structured JSON logged to stdout
+- Anonymous `session_id` (client-generated UUID stored in `sessionStorage`)
+- Fire-and-forget from client — never blocks response
+- No PII, no teacher identity
 
 ## Key Commands
 

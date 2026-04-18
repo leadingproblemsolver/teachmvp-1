@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: crystallizer
+    description: Objective crystallizer operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,59 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /crystallize:
+    post:
+      operationId: crystallize
+      tags: [crystallizer]
+      summary: Crystallize a teacher intent into a structured objective
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrystallizerInput"
+      responses:
+        "200":
+          description: Successfully crystallized objective or clarifying question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrystallizerResponse"
+        "400":
+          description: Bad request - invalid input schema
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Behavioral specificity check failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrystallizerClarifyResponse"
+        "500":
+          description: LLM or server failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /log-edit:
+    post:
+      operationId: logEdit
+      tags: [crystallizer]
+      summary: Log a field-level edit event (fire-and-forget)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditLogEvent"
+      responses:
+        "204":
+          description: Event logged
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +89,87 @@ components:
       required:
         - status
 
+    CrystallizerInput:
+      type: object
+      properties:
+        intent:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      required:
+        - intent
+
+    ObjectiveOutput:
+      type: object
+      properties:
+        maximize:
+          type: string
+          maxLength: 80
+        must_not_break:
+          type: string
+          maxLength: 80
+        success_criterion:
+          type: string
+          maxLength: 100
+      required:
+        - maximize
+        - must_not_break
+        - success_criterion
+
+    CrystallizerOkResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        objective:
+          $ref: "#/components/schemas/ObjectiveOutput"
+      required:
+        - status
+        - objective
+
+    CrystallizerClarifyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [clarify]
+        question:
+          type: string
+          maxLength: 150
+      required:
+        - status
+        - question
+
+    CrystallizerResponse:
+      oneOf:
+        - $ref: "#/components/schemas/CrystallizerOkResponse"
+        - $ref: "#/components/schemas/CrystallizerClarifyResponse"
+
+    EditLogEvent:
+      type: object
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        field:
+          type: string
+          enum: [maximize, must_not_break, success_criterion]
+        edited:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - session_id
+        - field
+        - edited
+        - timestamp
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

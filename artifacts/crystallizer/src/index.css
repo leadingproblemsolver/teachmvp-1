@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+
+  --font-sans: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  --background: 30 15% 97%;
+  --foreground: 20 14% 12%;
+  --border: 25 12% 88%;
+  --input: 25 10% 85%;
+  --ring: 20 60% 40%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 20 14% 12%;
+
+  --primary: 20 65% 38%;
+  --primary-foreground: 30 100% 98%;
+
+  --muted: 25 10% 93%;
+  --muted-foreground: 20 8% 46%;
+
+  --accent: 25 20% 90%;
+  --accent-foreground: 20 14% 12%;
+
+  --destructive: 0 72% 51%;
+
+  --app-font-sans: 'Inter', 'system-ui', sans-serif;
+  --app-font-mono: 'Menlo', monospace;
+  --radius: 0.375rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}

@@ -8,3 +8,69 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface CrystallizerInput {
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  intent: string;
+}
+
+export interface ObjectiveOutput {
+  /** @maxLength 80 */
+  maximize: string;
+  /** @maxLength 80 */
+  must_not_break: string;
+  /** @maxLength 100 */
+  success_criterion: string;
+}
+
+export type CrystallizerOkResponseStatus =
+  (typeof CrystallizerOkResponseStatus)[keyof typeof CrystallizerOkResponseStatus];
+
+export const CrystallizerOkResponseStatus = {
+  ok: "ok",
+} as const;
+
+export interface CrystallizerOkResponse {
+  status: CrystallizerOkResponseStatus;
+  objective: ObjectiveOutput;
+}
+
+export type CrystallizerClarifyResponseStatus =
+  (typeof CrystallizerClarifyResponseStatus)[keyof typeof CrystallizerClarifyResponseStatus];
+
+export const CrystallizerClarifyResponseStatus = {
+  clarify: "clarify",
+} as const;
+
+export interface CrystallizerClarifyResponse {
+  status: CrystallizerClarifyResponseStatus;
+  /** @maxLength 150 */
+  question: string;
+}
+
+export type CrystallizerResponse =
+  | CrystallizerOkResponse
+  | CrystallizerClarifyResponse;
+
+export type EditLogEventField =
+  (typeof EditLogEventField)[keyof typeof EditLogEventField];
+
+export const EditLogEventField = {
+  maximize: "maximize",
+  must_not_break: "must_not_break",
+  success_criterion: "success_criterion",
+} as const;
+
+export interface EditLogEvent {
+  session_id: string;
+  field: EditLogEventField;
+  edited: boolean;
+  timestamp: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+}
