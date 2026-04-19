@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Objective Crystallizer"
+version = "1.0.0"
+id = "artifacts/crystallizer"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21342
+
+[services.development]
+run = "pnpm --filter @workspace/crystallizer run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/crystallizer", "run", "build" ]
+publicDir = "artifacts/crystallizer/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21342"
+BASE_PATH = "/"
